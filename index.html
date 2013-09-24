@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Need-based AI demo</title>
+		<script src="js/being.js"></script>
+		<script src="js/ai.js"></script>
+	</head>
+	<body>
+		<h1>Need-based AI demo</h1>
+		<p>(scroll down for explanation)</p>
+		<fieldset>
+			<legend>LOG</legend>
+			<textarea id="log" rows="10" cols="60"></textarea>
+			<input type="button" value="Clear" onclick="document.querySelector('#log').value = ''" />
+		</fieldset>
+		
+		<fieldset>
+			<legend>Act</legend>
+			<p>Let a being perform a turn</p>
+			<div class="beings" data-function="act"></div>
+		</fieldset>
+
+		<fieldset>
+			<legend>Eat</legend>
+			<p>Let a being eat stuff</p>
+			<div class="beings" data-function="eat"></div>
+		</fieldset>
+
+		<fieldset>
+			<legend>Damage</legend>
+			<p>Let a being take damage</p>
+			<div class="beings" data-function="damage"></div>
+		</fieldset>
+		
+		<fieldset>
+			<legend>Explanation</legend>
+			<p>
+			This page demonstrates some patterns related to need-based AI. 
+			There are four beings in the game; two of them are brainless, 
+			two of them use the need-based AI. Click a being's name to have
+			it perform a certain action.</p>
+			
+			<p>Every turn, the amount of hunger increases by 1. When it reaches 6, being dies of starvation.</p>
+		</fieldset>
+
+		<script>
+			new Being("Brainless 1");
+			new Being("Brainless 2");
+			new AI(new Being("AI 1"));
+			new AI(new Being("AI 2"));
+			
+			var act = function(being) {
+				being.act();
+			}
+			
+			var eat = function(being) {
+				being.eat();
+			}
+			
+			var damage = function(being) {
+				var avail = BEINGS.filter(function(b) { return b!=being; });
+				if (!avail.length) { return; }
+				var index = Math.floor(Math.random()*avail.length);
+				var attacker = avail[index];
+				being.damage(attacker);
+			}
+
+			document.querySelector("#log").value = "";
+			
+			document.addEventListener("click", function(e) {
+				var node = e.target;
+				if (node.nodeName.toLowerCase() != "button") { return; }
+				var parent = node.parentNode;
+				var index = -1;
+				for (var i=0;i<parent.childNodes.length;i++) {
+					if (parent.childNodes[i] == node) { index = i; }
+				}
+				var being = BEINGS[index];
+				var func = parent.getAttribute("data-function");
+				window[func](being);
+				buildButtons();
+			});
+			
+			var buildButtons = function() {
+				var nodes = document.querySelectorAll(".beings");
+				for (var i=0;i<nodes.length;i++) {
+					var node = nodes[i];
+					node.innerHTML = "";
+					BEINGS.forEach(function(being) {
+						var button = document.createElement("button");
+						button.innerHTML = being.getName();
+						node.appendChild(button);
+					});
+				}
+			}
+
+			buildButtons();
+		</script>
+	</body>
+</html>
