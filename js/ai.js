@@ -1,6 +1,5 @@
 var AI = function(being) {
 	this._being = being;
-	this._being._ai = this;
 
 	this._needs = {
 		survival: 1,
